@@ -20,7 +20,7 @@ class AppRoutes {
     switch (settings.name) {
       case startUp:
         return MaterialPageRoute(
-          builder: (BuildContext context) => LandingPage(),
+          builder: (BuildContext context) => CountriesPage(), //LandingPage(),
           settings: settings,
         );
       case about:
