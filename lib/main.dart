@@ -13,7 +13,7 @@ class PalotaCountriesAssessmentApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put<CountriesController>(CountriesController());
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,

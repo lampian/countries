@@ -1,17 +1,3 @@
-// South Africa
-// covers an area of
-// 1221037
-// km² and has a population of
-// 55653654
-//  - the nation has a Gini coefficient of
-//  63.1
-//  . A resident of South Africa is called a
-//  South African
-//  . The main currency accepted as legal tender is the
-//  South African rand
-//   which is expressed with the symbol
-//   'R'.
-
 class CountryModel {
   CountryModel({
     this.name,
@@ -29,7 +15,7 @@ class CountryModel {
     this.code,
   });
   String name;
-  int area;
+  double area;
   int population;
   double giniCoefficient;
   String demonym;
@@ -43,7 +29,34 @@ class CountryModel {
   String code;
 
   CountryModel.fromJson(Map<dynamic, dynamic> json) {
-    name = json['name'].toString();
+    name = json['name'];
+    area = json['area'];
+    population = json['population'];
+    giniCoefficient = json['gini'];
+    demonym = json['demonym'];
+    currency = json['currencies'][0]['code'];
+    currencySymbol = json['currencies'][0]['symbol'];
+    subRegion = json['subregion'];
+    capital = json['capital'];
+    List<dynamic> langList = json['languages'];
+    languages = List<LanguageModel>();
+    langList.forEach((element) {
+      print(element);
+      languages.add(
+        LanguageModel(
+          name: element['name'],
+          nativeName: element['nativeName'],
+        ),
+      );
+    });
+    List<dynamic> borderList = json['borders'];
+    borders = List<String>();
+    borderList.forEach((element) {
+      print(element);
+      borders.add(element);
+    });
+    flagUrl = json['flag'];
+    code = json['alpha2Code'];
   }
 }
 
@@ -51,4 +64,10 @@ class LanguageModel {
   String nativeName;
   String name;
   LanguageModel({this.name, this.nativeName});
+}
+
+class FlagModel {
+  String flagUrl;
+  String name;
+  FlagModel({this.flagUrl, this.name});
 }
