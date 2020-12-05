@@ -1,6 +1,7 @@
 import 'package:countries_info/model/country_model.dart';
 import 'package:countries_info/services/api.dart';
 import 'package:countries_info/services/api_service.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class CountriesController extends GetxController {
@@ -9,14 +10,14 @@ class CountriesController extends GetxController {
     apiService = ApiService(api);
   }
 
-  var _aText = '''List of countries.Click to navigate to country detail.'''.obs;
-  String get aText => _aText.string;
   API api;
   ApiService apiService;
-
-  // flag icon za name capital
+  TextEditingController searchTextCntl;
+  get searchText => this.searchTextCntl.text;
+  set searchText(String value) => this.searchTextCntl.text = value;
 
   var countries = List<CountryModel>().obs;
+  var original = List<CountryModel>();
 
   final noCountry = CountryModel(
       area: 0,
@@ -35,16 +36,45 @@ class CountriesController extends GetxController {
 
   @override
   Future<void> onInit() async {
+    searchTextCntl = TextEditingController();
+    searchText = '';
     var retList = await apiService.getEndPointData(EndPoint.africa);
     retList.forEach((element) {
       countries.add(element);
+      original.add(element);
     });
-
     super.onInit();
   }
 
+  void handleTextInput(String sStr) {
+    if (searchText.length > 0) {
+      countries.clear();
+      var tempList = original
+          .where((element) => element.name.toLowerCase().contains(searchText));
+      if (tempList.length == 0) {
+        original.forEach((x) {
+          countries.add(x);
+        });
+      } else {
+        tempList.forEach((x) {
+          countries.add(x);
+        });
+      }
+    } else {
+      original.forEach((x) {
+        countries.add(x);
+      });
+    }
+    update();
+  }
+
   CountryModel getCountryDetail(String countryName) {
-    return countries.firstWhere((element) => element.name == countryName);
+    try {
+      return countries.firstWhere((element) => element.name == countryName);
+    } catch (e) {
+      print(e);
+      return noCountry;
+    }
   }
 
   List<FlagModel> getBorderFlagUrl(List<String> borders) {
@@ -58,7 +88,11 @@ class CountriesController extends GetxController {
         country.name = element;
         country.flagUrl = 'null';
       }
-      borderInfo.add(FlagModel(name: country.name, flagUrl: country.flagUrl));
+      borderInfo.add(FlagModel(
+        name: country.name,
+        flagUrl: country.flagUrl,
+        code: country.code,
+      ));
     });
     return borderInfo;
   }

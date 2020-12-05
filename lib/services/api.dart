@@ -14,6 +14,6 @@ class API {
 
   static Map<EndPoint, String> _paths = {
     EndPoint.all: '/rest/v2/all',
-    EndPoint.africa: '/rest/v2/africa',
+    EndPoint.africa: '/rest/v2/region/africa',
   };
 }

@@ -69,5 +69,6 @@ class LanguageModel {
 class FlagModel {
   String flagUrl;
   String name;
-  FlagModel({this.flagUrl, this.name});
+  String code;
+  FlagModel({this.flagUrl, this.name, this.code});
 }

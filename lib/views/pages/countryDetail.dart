@@ -1,19 +1,21 @@
-import 'package:countries_info/controllers/CountriesController.dart';
-import 'package:countries_info/model/country_model.dart';
+import 'package:countries_info/controllers/countries_controller.dart';
+import 'package:countries_info/controllers/country_detail_controller.dart';
+import 'package:countries_info/services/helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../routes.dart';
 
-class CountryDetailPage extends GetWidget<CountriesController> {
+class CountryDetailPage extends GetWidget<CountryDetailController> {
   CountryDetailPage(this.name);
   final name;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
+        title: GetX(builder: (contrller) {
+          return Text(controller.country.name);
+        }),
         actions: [
           IconButton(
               icon: Icon(Icons.info_outline),
@@ -31,137 +33,154 @@ class CountryDetailPage extends GetWidget<CountriesController> {
   }
 
   Widget getBody() {
-    final theCountry = controller.getCountryDetail(name);
+    var contl = Get.find<CountriesController>();
+    controller.country = contl.getCountryDetail(name);
     return SingleChildScrollView(
       child: Column(
         children: [
           SizedBox(height: 12),
-          nameRow(theCountry),
+          nameRow(),
           SizedBox(height: 10),
-          flagRow(theCountry),
-          descriptionRow(theCountry),
+          GetBuilder<CountryDetailController>(builder: (_) {
+            return flagRow();
+          }),
+          descriptionRow(),
           SizedBox(height: 12),
-          infoRow(
-            Icons.location_on_outlined,
-            'Sub-region',
-            theCountry.subRegion,
-          ),
-          infoRow(
-            Icons.location_city_sharp,
-            'Captial',
-            theCountry.capital,
-          ),
+          GetBuilder<CountryDetailController>(builder: (_) {
+            return infoRow(
+              Icons.location_on_outlined,
+              'Sub-region',
+              controller.country.subRegion,
+            );
+          }),
+          GetBuilder<CountryDetailController>(builder: (_) {
+            return infoRow(
+              Icons.location_city_sharp,
+              'Captial',
+              controller.country.capital,
+            );
+          }),
           labelRow(Icons.language_sharp, 'Languages'),
           SizedBox(height: 6),
-          languageRow(theCountry),
+          languageRow(),
           labelRow(Icons.map_outlined, 'Bordering Countries'),
-          neigbourRow(theCountry.borders),
+          neigbourRow(),
           SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Container neigbourRow(List<String> borders) {
-    final borderInfo = controller.getBorderFlagUrl(borders);
+  Container neigbourRow() {
+    var contl = Get.find<CountriesController>();
+    final borderInfo = contl.getBorderFlagUrl(controller.country.borders);
     return Container(
       height: 80,
-      child: ListView.builder(
-        itemCount: borderInfo.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (BuildContext context, int index) {
-          //return Text(borderInfo[index].flagUrl);
-          return FlatButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            ),
-            onPressed: () {},
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: borderInfo[index].flagUrl != null
-                  ? SvgPicture.network(
-                      borderInfo[index].flagUrl,
-                      height: 80,
-                      placeholderBuilder: (_) =>
-                          Image.asset('assets/images/blankflag.png'),
-                    )
-                  : Image.asset('assets/images/blankflag.png'),
-            ),
-          );
+      child: GetX(
+        builder: (_) {
+          return controller.country.borders == null
+              ? Container()
+              : ListView.builder(
+                  itemCount: borderInfo.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, int index) {
+                    //return Text(borderInfo[index].flagUrl);
+                    return FlatButton(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      ),
+                      onPressed: () {
+                        controller.country =
+                            contl.getCountryDetail(borderInfo[index].name);
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.0),
+                        child: borderInfo[index].flagUrl != null
+                            ? svgPicture(borderInfo[index].flagUrl, 80.0,
+                                borderInfo[index].code)
+                            : Image.asset('assets/images/blankflag.png'),
+                      ),
+                    );
+                  },
+                );
         },
       ),
     );
   }
 
-  Padding languageRow(CountryModel theCountry) {
+  Padding languageRow() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: GridView.builder(
-        shrinkWrap: true,
-        itemCount: theCountry.languages.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, childAspectRatio: 2.4),
-        //primary: false,
-        itemBuilder: (BuildContext context, int index) {
-          return Card(
-            child: Container(
-              margin: EdgeInsets.fromLTRB(1, 1, 1, 1),
-              height: 5.0,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.cyan[400], Colors.blue[700]],
-                  stops: [0.0, 0.6],
-                ),
-                //color: Colors.blue[600],
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white,
-                    spreadRadius: 0.0,
-                    blurRadius: 0.0,
-                    offset: Offset(0, 0),
-                  ),
-                ],
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    //SizedBox(width: 12),
-                    SizedBox(height: 3),
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Text(
-                        theCountry.languages[index].name,
-                        style: TextStyle(
+      child: GetX(builder: (_) {
+        return controller.country.languages == null
+            ? Container()
+            : GridView.builder(
+                shrinkWrap: true,
+                itemCount: controller.country.languages.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 2.4),
+                //primary: false,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: Container(
+                      margin: EdgeInsets.fromLTRB(1, 1, 1, 1),
+                      height: 5.0,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.cyan[400], Colors.blue[700]],
+                          stops: [0.0, 0.6],
+                        ),
+                        //color: Colors.blue[600],
+                        boxShadow: [
+                          BoxShadow(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.0),
+                            spreadRadius: 0.0,
+                            blurRadius: 0.0,
+                            offset: Offset(0, 0),
+                          ),
+                        ],
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                            bottomLeft: Radius.circular(16),
+                            bottomRight: Radius.circular(16)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            //SizedBox(width: 12),
+                            SizedBox(height: 3),
+                            Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Text(
+                                controller.country.languages[index].name,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0),
+                              ),
+                            ),
+                            //SizedBox(width: 1),
+                            Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Text(
+                                '(${controller.country.languages[index].nativeName})',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    //SizedBox(width: 1),
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Text(
-                        '(${theCountry.languages[index].nativeName})',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.0),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+                  );
+                },
+              );
+      }),
     );
   }
 
@@ -237,7 +256,7 @@ class CountryDetailPage extends GetWidget<CountriesController> {
     );
   }
 
-  Padding descriptionRow(CountryModel theCountry) {
+  Padding descriptionRow() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -259,33 +278,34 @@ class CountryDetailPage extends GetWidget<CountriesController> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Text(
-            controller.getDescription(theCountry),
-            style: TextStyle(height: 1.5),
-          ),
+          child: GetX(builder: (_) {
+            return Text(
+              controller.getDescription(),
+              style: TextStyle(height: 1.5),
+            );
+          }),
         ),
       ),
     );
   }
 
-  Padding flagRow(CountryModel theCountry) {
+  Padding flagRow() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: FittedBox(
         fit: BoxFit.fitWidth,
-        child: theCountry.flagUrl != null
-            ? SvgPicture.network(
-                theCountry.flagUrl,
-                height: 500,
-                placeholderBuilder: (_) =>
-                    Image.asset('assets/images/blankflag.png'),
+        child: controller.country.flagUrl != null
+            ? svgPicture(
+                controller.country.flagUrl,
+                500.0,
+                controller.country.code,
               )
             : Image.asset('assets/images/blankflag.png'),
       ),
     );
   }
 
-  Row nameRow(CountryModel theCountry) {
+  Row nameRow() {
     return Row(
       children: [
         Padding(
@@ -293,13 +313,15 @@ class CountryDetailPage extends GetWidget<CountriesController> {
           child: Container(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(
-                theCountry.code,
-                style: TextStyle(
-                    color: Colors.grey[100],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.0),
-              ),
+              child: GetX(builder: (contrller) {
+                return Text(
+                  controller.country.code,
+                  style: TextStyle(
+                      color: Colors.grey[100],
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0),
+                );
+              }),
             ),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -317,20 +339,24 @@ class CountryDetailPage extends GetWidget<CountriesController> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              theCountry.name,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
-              ),
-            ),
-            Text(
-              theCountry.subRegion,
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 10.0,
-              ),
-            )
+            GetX(builder: (contrller) {
+              return Text(
+                controller.country.name, //theCountry.name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              );
+            }),
+            GetX(builder: (contrller) {
+              return Text(
+                controller.country.subRegion, //theCountry.subRegion,
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 10.0,
+                ),
+              );
+            }),
           ],
         ),
       ],
