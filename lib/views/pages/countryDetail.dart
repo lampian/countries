@@ -73,15 +73,17 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
 
   Container neigbourRow() {
     var contl = Get.find<CountriesController>();
-    final borderInfo = contl.getBorderFlagUrl(controller.country.borders);
     return Container(
       height: 80,
       child: GetX(
         builder: (_) {
-          return controller.country.borders == null
+          controller.borderInfo =
+              contl.getBorderFlagUrl(controller.country.borders);
+          var noBorders = controller.borderInfo.length;
+          return noBorders == 0
               ? Container()
               : ListView.builder(
-                  itemCount: borderInfo.length,
+                  itemCount: noBorders,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (BuildContext context, int index) {
                     //return Text(borderInfo[index].flagUrl);
@@ -90,14 +92,14 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
                         borderRadius: BorderRadius.all(Radius.circular(20.0)),
                       ),
                       onPressed: () {
-                        controller.country =
-                            contl.getCountryDetail(borderInfo[index].name);
+                        controller.country = contl.getCountryDetail(
+                            controller.borderInfo[index].name);
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20.0),
-                        child: borderInfo[index].flagUrl != null
-                            ? svgPicture(borderInfo[index].flagUrl, 80.0,
-                                borderInfo[index].code)
+                        child: controller.borderInfo[index].flagUrl != null
+                            ? svgPicture(controller.borderInfo[index].flagUrl,
+                                80.0, controller.borderInfo[index].borderCode)
                             : Image.asset('assets/images/blankflag.png'),
                       ),
                     );

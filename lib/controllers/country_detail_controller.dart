@@ -25,6 +25,17 @@ class CountryDetailController extends GetxController {
 
   CountryModel get country => _country.value;
 
+  var _borderInfo = <FlagModel>[].obs;
+  set borderInfo(List<FlagModel> newBorder) {
+    _borderInfo.clear();
+    newBorder.forEach((element) {
+      _borderInfo.add(element);
+    });
+    //update();
+  }
+
+  List<FlagModel> get borderInfo => _borderInfo;
+
   String getDescription() {
     return '${country.name} covers an area of '
         '${country.area} km² and has a population of '

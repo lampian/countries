@@ -83,7 +83,7 @@ class CountriesController extends GetxController {
     borders.forEach((element) {
       var country = CountryModel();
       try {
-        country = countries.firstWhere((x) => x.code == element);
+        country = countries.firstWhere((x) => x.borderCode == element);
       } catch (e) {
         country.name = element;
         country.flagUrl = 'null';
@@ -91,7 +91,7 @@ class CountriesController extends GetxController {
       borderInfo.add(FlagModel(
         name: country.name,
         flagUrl: country.flagUrl,
-        code: country.code,
+        borderCode: country.code,
       ));
     });
     return borderInfo;

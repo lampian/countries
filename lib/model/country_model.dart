@@ -27,6 +27,7 @@ class CountryModel {
   List<String> borders;
   String flagUrl;
   String code;
+  String borderCode;
 
   CountryModel.fromJson(Map<dynamic, dynamic> json) {
     name = json['name'];
@@ -57,6 +58,7 @@ class CountryModel {
     });
     flagUrl = json['flag'];
     code = json['alpha2Code'];
+    borderCode = json['alpha3Code'];
   }
 }
 
@@ -69,6 +71,6 @@ class LanguageModel {
 class FlagModel {
   String flagUrl;
   String name;
-  String code;
-  FlagModel({this.flagUrl, this.name, this.code});
+  String borderCode;
+  FlagModel({this.flagUrl, this.name, this.borderCode});
 }
