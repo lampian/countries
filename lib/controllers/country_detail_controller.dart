@@ -36,6 +36,8 @@ class CountryDetailController extends GetxController {
 
   List<FlagModel> get borderInfo => _borderInfo;
 
+  //compose the country description from the various fields
+  //using the template from the detail design
   String getDescription() {
     return '${country.name} covers an area of '
         '${country.area} km² and has a population of '

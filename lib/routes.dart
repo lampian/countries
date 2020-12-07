@@ -20,6 +20,7 @@ class AppRoutes {
     switch (settings.name) {
       case startUp:
         return MaterialPageRoute(
+          //TODO put landing page back again
           builder: (BuildContext context) => CountriesPage(), //LandingPage(),
           settings: settings,
         );

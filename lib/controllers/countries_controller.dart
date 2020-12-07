@@ -16,8 +16,11 @@ class CountriesController extends GetxController {
   get searchText => this.searchTextCntl.text;
   set searchText(String value) => this.searchTextCntl.text = value;
 
+  //list used by pages and is filtered according to the search string
   var countries = List<CountryModel>().obs;
-  var original = List<CountryModel>();
+  //original list of countries with their information - does not change
+  // once loaded
+  final original = List<CountryModel>();
 
   final noCountry = CountryModel(
       area: 0,
@@ -46,6 +49,7 @@ class CountriesController extends GetxController {
     super.onInit();
   }
 
+  // search control that also updates the list of countries
   void handleTextInput(String sStr) {
     if (searchText.length > 0) {
       countries.clear();
@@ -68,22 +72,26 @@ class CountriesController extends GetxController {
     update();
   }
 
+  //return details of country using original list not the filtered
+  //list as the request can originate from neigbouring country selection
   CountryModel getCountryDetail(String countryName) {
     try {
-      return countries.firstWhere((element) => element.name == countryName);
+      return original.firstWhere((element) => element.name == countryName);
     } catch (e) {
       print(e);
       return noCountry;
     }
   }
 
+  // return list of flags from neighbouring coutries using original list
+  // because borders may/will contain coutries outside filtered list countries
   List<FlagModel> getBorderFlagUrl(List<String> borders) {
     var borderInfo = List<FlagModel>();
     //var flagInfo = FlagModel();
-    borders.forEach((element) {
+    borders?.forEach((element) {
       var country = CountryModel();
       try {
-        country = countries.firstWhere((x) => x.borderCode == element);
+        country = original.firstWhere((x) => x.borderCode == element);
       } catch (e) {
         country.name = element;
         country.flagUrl = 'null';
@@ -95,16 +103,5 @@ class CountriesController extends GetxController {
       ));
     });
     return borderInfo;
-  }
-
-  String getDescription(CountryModel country) {
-    return '${country.name} covers an area of '
-        '${country.area} km² and has a population of '
-        '${country.population} - the nation has a Gini coefficient of '
-        '${country.giniCoefficient}. A resident of '
-        '${country.name} is called an '
-        '${country.demonym}. The main currency accepted as legal tender is the '
-        '${country.currency} which is expressed with the symbol '
-        '\'${country.currencySymbol}\'';
   }
 }

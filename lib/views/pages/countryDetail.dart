@@ -64,52 +64,52 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
           SizedBox(height: 6),
           languageRow(),
           labelRow(Icons.map_outlined, 'Bordering Countries'),
-          neigbourRow(),
+          GetBuilder<CountryDetailController>(builder: (_) {
+            return neigbourRow();
+          }),
           SizedBox(height: 16),
         ],
       ),
     );
   }
 
+  // handle the flags shown at the bottom of the detail page
+  // allowing the flags to be selected and using that info to load the country
   Container neigbourRow() {
     var contl = Get.find<CountriesController>();
+    controller.borderInfo = contl.getBorderFlagUrl(controller.country.borders);
+    var noBorders = controller.borderInfo.length;
     return Container(
       height: 80,
-      child: GetX(
-        builder: (_) {
-          controller.borderInfo =
-              contl.getBorderFlagUrl(controller.country.borders);
-          var noBorders = controller.borderInfo.length;
-          return noBorders == 0
-              ? Container()
-              : ListView.builder(
-                  itemCount: noBorders,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (BuildContext context, int index) {
-                    //return Text(borderInfo[index].flagUrl);
-                    return FlatButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      ),
-                      onPressed: () {
-                        controller.country = contl.getCountryDetail(
-                            controller.borderInfo[index].name);
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0),
-                        child: controller.borderInfo[index].flagUrl != null
-                            ? svgPicture(controller.borderInfo[index].flagUrl,
-                                80.0, controller.borderInfo[index].borderCode)
-                            : Image.asset('assets/images/blankflag.png'),
-                      ),
-                    );
+      child: noBorders == 0 //no borders no show
+          ? Container()
+          : ListView.builder(
+              itemCount: noBorders,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (BuildContext context, int index) {
+                return FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  // selecting a border flag loads that coutries details
+                  onPressed: () {
+                    controller.country = contl
+                        .getCountryDetail(controller.borderInfo[index].name);
                   },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: controller.borderInfo[index].flagUrl != null
+                        ? svgPicture(controller.borderInfo[index].flagUrl, 80.0,
+                            controller.borderInfo[index].borderCode)
+                        : Image.asset('assets/images/blankflag.png'),
+                  ),
                 );
-        },
-      ),
+              },
+            ),
     );
   }
 
+  // display the national languages of the country in a grid format
   Padding languageRow() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -186,7 +186,8 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
     );
   }
 
-  Align labelRow(
+  // Reusable label to highlight secions
+  Widget labelRow(
     IconData labelIcon,
     String labelText,
   ) {
@@ -238,7 +239,8 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
     );
   }
 
-  Column infoRow(IconData infoIcon, String heading, String infoField) {
+  //reusable info block used to for sub region and capital information
+  Widget infoRow(IconData infoIcon, String heading, String infoField) {
     return Column(
       children: [
         ListTile(
@@ -258,7 +260,8 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
     );
   }
 
-  Padding descriptionRow() {
+  // Country description text block
+  Widget descriptionRow() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -291,7 +294,8 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
     );
   }
 
-  Padding flagRow() {
+  //display the country flag
+  Widget flagRow() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: FittedBox(
@@ -307,7 +311,8 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
     );
   }
 
-  Row nameRow() {
+  //display the country name, sub region and code
+  Widget nameRow() {
     return Row(
       children: [
         Padding(
@@ -343,7 +348,7 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
           children: [
             GetX(builder: (contrller) {
               return Text(
-                controller.country.name, //theCountry.name,
+                controller.country.name,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
@@ -352,7 +357,7 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
             }),
             GetX(builder: (contrller) {
               return Text(
-                controller.country.subRegion, //theCountry.subRegion,
+                controller.country.subRegion,
                 style: TextStyle(
                   fontWeight: FontWeight.normal,
                   fontSize: 10.0,
