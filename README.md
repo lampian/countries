@@ -1,3 +1,14 @@
+# Assessment implementation screen shots:
+
+
+<img src="/assets/images/screenshot1.png" width="300">                <img src="/assets/images/screenshot2.png" width="300">
+<img src="/assets/images/screenshot3.png" width="300">
+<img src="/assets/images/screenshot4.png" width="300">
+<img src="/assets/images/screenshot5.png" width="300">
+
+
+
+
 # Palota Countries Info
 
 Palota assessment starter project | Flutter Countries info
