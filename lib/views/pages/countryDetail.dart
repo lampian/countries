@@ -1,3 +1,5 @@
+//import 'dart:js';
+
 import 'package:countries_info/controllers/countries_controller.dart';
 import 'package:countries_info/controllers/country_detail_controller.dart';
 import 'package:countries_info/services/helper.dart';
@@ -119,8 +121,11 @@ class CountryDetailPage extends GetWidget<CountryDetailController> {
             : GridView.builder(
                 shrinkWrap: true,
                 itemCount: controller.country.languages.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, childAspectRatio: 2.4),
+                gridDelegate: Get.context.isPortrait
+                    ? SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, childAspectRatio: 2.4)
+                    : SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4, childAspectRatio: 2.4),
                 //primary: false,
                 itemBuilder: (BuildContext context, int index) {
                   return Card(
