@@ -30,28 +30,36 @@ class CountriesPage extends GetWidget<CountriesController> {
 
   //widget responsible for listing the countries
   Widget getBody() {
-    return Container(
-      child: GetX(
-        builder: (_) {
-          if (controller.countries.length == 0 && controller.searchText == '') {
-            return showLoading();
-          } else if (controller.countries.length == 0 &&
-              controller.searchText != '') {
-            return showNoneFound();
-          } else {
-            return showList();
-          }
-        },
+    return RefreshIndicator(
+      onRefresh: () => controller.checkEndPoint(),
+      child: Container(
+        child: GetX(
+          builder: (_) {
+            if (controller.countries.length == 0 &&
+                controller.searchText == '') {
+              return showLoading();
+            } else if (controller.countries.length == 0 &&
+                controller.searchText != '') {
+              return showNoneFound();
+            } else {
+              return showList();
+            }
+          },
+        ),
       ),
     );
   }
 
-  Expanded showLoading() {
+  Widget showLoading() {
     return Expanded(
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text('Trying to obtain country data . .'),
+            SizedBox(height: 10),
+            Text('Please check yout internet connecion'),
+            SizedBox(height: 60),
             CircularProgressIndicator(),
           ]),
     );
@@ -214,6 +222,7 @@ class CountriesPage extends GetWidget<CountriesController> {
               icon: Icon(Icons.clear_sharp),
               onPressed: () {
                 controller.searchTextCntl.clear();
+                controller.handleTextInput('');
               },
             ),
             enabledBorder: OutlineInputBorder(

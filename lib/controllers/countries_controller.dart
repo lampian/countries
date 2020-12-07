@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:countries_info/model/country_model.dart';
 import 'package:countries_info/services/api.dart';
 import 'package:countries_info/services/api_service.dart';
@@ -9,7 +11,9 @@ class CountriesController extends GetxController {
     api = API();
     apiService = ApiService(api);
   }
-
+  //TODO
+  // think about implementing a StreamBuilder to provide api data
+  Timer checkApi; //timer to check api if no data loaded
   API api;
   ApiService apiService;
   TextEditingController searchTextCntl;
@@ -41,12 +45,37 @@ class CountriesController extends GetxController {
   Future<void> onInit() async {
     searchTextCntl = TextEditingController();
     searchText = '';
+    await getEndPointData();
+    if (countries.length == 0) {
+      checkApi = Timer.periodic(Duration(seconds: 3), (timer) {
+        checkApiTimerEvent();
+      });
+    }
+    super.onInit();
+  }
+
+  // timer event to check if api active and data available
+  Future<void> checkApiTimerEvent() async {
+    if (countries.length != 0) {
+      checkApi.cancel();
+    } else {
+      await getEndPointData();
+    }
+  }
+
+  Future<void> checkEndPoint() async {
+    while (countries.length == 0) {
+      await getEndPointData();
+      Future.delayed(Duration(seconds: 7));
+    }
+  }
+
+  Future<void> getEndPointData() async {
     var retList = await apiService.getEndPointData(EndPoint.africa);
     retList.forEach((element) {
       countries.add(element);
       original.add(element);
     });
-    super.onInit();
   }
 
   // search control that also updates the list of countries

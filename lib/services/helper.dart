@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 const blankFlagName = 'assets/images/blankflag.png';
 
-//TODO Svg still has an problem with some files - use the png
-// link supplied until the issue is resolved.
+//TODO
+// Svg still has an problem with some files -
+// use the png link supplied until the issue is resolved.
 Widget svgPicture(String url, double height, String code) {
   //SvgPicture aSvg;
   final endPoint = 'https://flagcdn.com/w640/';
