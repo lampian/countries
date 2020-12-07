@@ -21,7 +21,7 @@ class AppRoutes {
       case startUp:
         return MaterialPageRoute(
           //TODO put landing page back again
-          builder: (BuildContext context) => CountriesPage(), //LandingPage(),
+          builder: (BuildContext context) => LandingPage(), //CountriesPage(),
           settings: settings,
         );
       case about:
